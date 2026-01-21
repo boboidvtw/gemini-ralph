@@ -4,7 +4,7 @@ from google.generativeai.types import FunctionDeclaration, Tool
 from typing import List, Dict, Any, Optional
 
 class GeminiClient:
-    def __init__(self, model_name: str = "gemini-2.0-flash", api_key: str = None):
+    def __init__(self, model_name: str = "gemini-flash-latest", api_key: str = None):
         if not api_key:
             api_key = os.getenv("GOOGLE_API_KEY")
             if not api_key:
