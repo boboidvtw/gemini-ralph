@@ -4,7 +4,7 @@ from google.generativeai.types import FunctionDeclaration, Tool
 from typing import List, Dict, Any, Optional
 
 class GeminiClient:
-    def __init__(self, model_name: str = "gemini-1.5-pro", api_key: str = None):
+    def __init__(self, model_name: str = "gemini-2.0-flash", api_key: str = None):
         if not api_key:
             api_key = os.getenv("GOOGLE_API_KEY")
             if not api_key:
@@ -18,10 +18,10 @@ class GeminiClient:
                 "name": "write_file",
                 "description": "Write content to a file. Creates directories if needed.",
                 "parameters": {
-                    "type": "object",
+                    "type": "OBJECT",
                     "properties": {
-                        "path": {"type": "string", "description": "File path"},
-                        "content": {"type": "string", "description": "Content to write"}
+                        "path": {"type": "STRING", "description": "File path"},
+                        "content": {"type": "STRING", "description": "Content to write"}
                     },
                     "required": ["path", "content"]
                 }
@@ -30,9 +30,9 @@ class GeminiClient:
                 "name": "read_file",
                 "description": "Read content from a file.",
                 "parameters": {
-                    "type": "object",
+                    "type": "OBJECT",
                     "properties": {
-                        "path": {"type": "string", "description": "File path"}
+                        "path": {"type": "STRING", "description": "File path"}
                     },
                     "required": ["path"]
                 }
@@ -41,9 +41,9 @@ class GeminiClient:
                 "name": "run_command",
                 "description": "Run a shell command.",
                 "parameters": {
-                    "type": "object",
+                    "type": "OBJECT",
                     "properties": {
-                        "command": {"type": "string", "description": "Command to execute"}
+                        "command": {"type": "STRING", "description": "Command to execute"}
                     },
                     "required": ["command"]
                 }
@@ -52,9 +52,9 @@ class GeminiClient:
                  "name": "list_dir",
                  "description": "List files in a directory.",
                  "parameters": {
-                     "type": "object",
+                     "type": "OBJECT",
                      "properties": {
-                         "path": {"type": "string", "description": "Directory path"}
+                         "path": {"type": "STRING", "description": "Directory path"}
                      },
                      "required": ["path"]
                  }
@@ -63,9 +63,9 @@ class GeminiClient:
                 "name": "task_completed",
                 "description": "Signal that the current task or project is complete.",
                 "parameters": {
-                    "type": "object",
+                    "type": "OBJECT",
                     "properties": {
-                        "summary": {"type": "string", "description": "Summary of work done"}
+                        "summary": {"type": "STRING", "description": "Summary of work done"}
                     },
                     "required": ["summary"]
                 }
@@ -74,7 +74,7 @@ class GeminiClient:
         
         self.model = genai.GenerativeModel(
             model_name=model_name,
-            tools=[genai.Tool(function_declarations=self.tools_def)]
+            tools=self.tools_def
         )
         self.chat = self.model.start_chat(enable_automatic_function_calling=False) # We handle execution manually for safety
 
