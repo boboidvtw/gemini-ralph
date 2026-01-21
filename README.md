@@ -34,7 +34,7 @@ A Python-native autonomous coding agent powered by Google Gemini (Flash 2.5/2.0/
 ## Rate Limits & Configuration
 
 ### Why is the loop slow?
-By default, the agent waits **20 seconds** between API error retries. This is specifically tuned for the **Gemini API Free Tier**, which has a strict rate limit (approx. 15 requests per minute).
+By default, the agent waits **30 seconds** between API error retries. This is specifically tuned for the **Gemini API Free Tier**, which has a strict rate limit (approx. 15 requests per minute).
 
 ### How to speed it up?
 If you have a **Paid (Pay-as-you-go)** Gemini API Key, you can reduce this delay for much faster execution.
@@ -42,5 +42,5 @@ If you have a **Paid (Pay-as-you-go)** Gemini API Key, you can reduce this delay
 To change the delay, edit `src/agent_loop.py`:
 ```python
 # src/agent_loop.py
-time.sleep(20) # Change 20 to 1 or 0 for paid plans
+time.sleep(30) # Change 30 to 1 or 0 for paid plans
 ```

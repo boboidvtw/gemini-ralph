@@ -60,7 +60,7 @@ class AgentLoop:
             except Exception as e:
                 print(f"⚠️ API Error: {e}")
                 self.breaker.record_error(str(e))
-                time.sleep(20) # Backoff (Increased to 20s for Free Tier Rate Limits)
+                time.sleep(30) # Backoff (Increased to 30s for Free Tier Rate Limits)
                 continue
 
             # 4. Handle Tool Calls

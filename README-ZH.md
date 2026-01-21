@@ -34,7 +34,7 @@
 ## 速率限制 (Rate Limits) 與設定
 
 ### 為什麼執行速度較慢？
-預設情況下，Agent 在發生 API 錯誤重試前會等待 **20 秒**。這是專門為 **Gemini API 免費版 (Free Tier)** 調整的設定，因為該方案有嚴格的速率限制 (約每分鐘 15 次請求)。
+預設情況下，Agent 在發生 API 錯誤重試前會等待 **30 秒**。這是專門為 **Gemini API 免費版 (Free Tier)** 調整的設定，因為該方案有嚴格的速率限制 (約每分鐘 15 次請求)。
 
 ### 如何加速？
 如果您擁有 **付費 (Pay-as-you-go)** 的 Gemini API Key，您可以縮短此延遲以獲得更快的執行速度。
@@ -42,5 +42,5 @@
 修改 `src/agent_loop.py`:
 ```python
 # src/agent_loop.py
-time.sleep(20) # 付費方案可將 20 改為 1 或 0
+time.sleep(30) # 付費方案可將 30 改為 1 或 0
 ```
