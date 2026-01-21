@@ -105,7 +105,13 @@ class AgentLoop:
                     # Note: In a real loop, we might buffer results or handle multi-turn.
                     # Here we treat tool output as immediate feedback for next step?
                     # Actually, for Gemini, we MUST send the function_response back immediately to close the turn.
-                    self.client.send_tool_result(name, tool_result)
+                    try:
+                        self.client.send_tool_result(name, tool_result)
+                    except Exception as e:
+                        print(f"⚠️ API Error (Tool Result): {e}")
+                        self.breaker.record_error(str(e))
+                        time.sleep(30) # Backoff for tool result errors
+                        # In worst case, loop continues, Gemini might retry or get confused, but Agent won't crash
                     
                 except Exception as e:
                     error_msg = f"Tool Execution Error: {str(e)}"
