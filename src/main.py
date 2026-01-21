@@ -1,8 +1,8 @@
 import os
 import sys
 
-# Add src to python path to allow imports
-sys.path.append(os.path.join(os.path.dirname(__file__)))
+# Add project root to python path to allow imports
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.agent_loop import AgentLoop
 from dotenv import load_dotenv
