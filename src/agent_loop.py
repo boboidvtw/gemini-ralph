@@ -38,10 +38,19 @@ class AgentLoop:
                 
                 # --- Stuck Detection ---
                 # Combine User Prompt + Model Response + Tool Calls (if any) as the "State"
-                # Using just Thought (response.text) is usually enough for loop detection
-                current_state_text = response.text or ""
+                current_state_text = ""
+                try:
+                    # Safely extract text if present
+                    if response.parts:
+                        for part in response.parts:
+                            if part.text:
+                                current_state_text += part.text
+                            elif part.function_call:
+                                current_state_text += f"[Tool: {part.function_call.name}]"
+                except Exception:
+                    pass # Fallback to empty if extraction fails
                 
-                if self.stuck_detector.check_is_stuck(current_state_text):
+                if current_state_text and self.stuck_detector.check_is_stuck(current_state_text):
                     print("⛔ Loop Detected (Stuck). Halting execution.")
                     self.breaker.record_error("Stuck Loop Detected")
                     break
