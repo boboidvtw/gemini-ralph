@@ -18,6 +18,12 @@ A Python-native autonomous coding agent powered by Google Gemini (Flash 2.5/2.0/
 - `src/tools.py`: Safe implementation of internal tools.
 - `src/circuit_breaker.py`: State machine for error tracking.
 
+## Generated Examples
+The following files were written **entirely by the autonomous agent** during verification tests. They are **NOT** part of the core agent logic:
+- `fib_gen.py`: A script generating Fibonacci numbers (Test Case #1).
+- `todo_cli.py`: A command-line Todo App (Test Case #2).
+- `results/`: Directory containing output from these test scripts.
+
 ## Usage
 1. **Install dependencies**:
    ```bash
