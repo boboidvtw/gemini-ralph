@@ -5,6 +5,7 @@ from typing import Optional
 from .gemini_client import GeminiClient
 from .tools import ToolSet
 from .circuit_breaker import CircuitBreaker, CircuitState
+from .stuck_detector import StuckDetector
 
 class AgentLoop:
     def __init__(self, task_file: str = "@fix_plan.md"):
@@ -12,6 +13,7 @@ class AgentLoop:
         self.client = GeminiClient()
         self.tools = ToolSet()
         self.breaker = CircuitBreaker()
+        self.stuck_detector = StuckDetector()
         self.loop_count = 0
 
     def run(self):
@@ -33,6 +35,18 @@ class AgentLoop:
             try:
                 print("🤖 Sending request to Gemini...")
                 response = self.client.send_message(prompt)
+                
+                # --- Stuck Detection ---
+                # Combine User Prompt + Model Response + Tool Calls (if any) as the "State"
+                # Using just Thought (response.text) is usually enough for loop detection
+                current_state_text = response.text or ""
+                
+                if self.stuck_detector.check_is_stuck(current_state_text):
+                    print("⛔ Loop Detected (Stuck). Halting execution.")
+                    self.breaker.record_error("Stuck Loop Detected")
+                    break
+                # -----------------------
+
                 self.breaker.record_success() # Reset consecutive errors on successful API call
             except Exception as e:
                 print(f"⚠️ API Error: {e}")
