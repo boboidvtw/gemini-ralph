@@ -9,6 +9,8 @@ A Python-native autonomous coding agent powered by Google Gemini (Flash 2.5/2.0/
     - **Vector Semantic Stuck Detection**: Uses Gemini Embeddings (`text-embedding-004`) to detect if the agent is semantically repeating itself.
 - **Gemini Powered**: Exploits the high-speed and reasoning capabilities of Gemini Flash models.
 - **Tool Sandbox**: Controlled environment for file system and terminal operations.
+- **Async Core**: Fully asynchronous architecture using `asyncio` for improved concurrency.
+- **State Persistence**: Uses SQLite to automatically save chat history and session state.
 
 ## Architecture
 
@@ -17,6 +19,7 @@ A Python-native autonomous coding agent powered by Google Gemini (Flash 2.5/2.0/
 - `src/stuck_detector.py`: Vector-based similarity engine for infinite loop detection.
 - `src/tools.py`: Safe implementation of internal tools.
 - `src/circuit_breaker.py`: State machine for error tracking.
+- `src/persistence.py`: SQLite-based state management and history retrieval.
 
 ## Generated Examples
 The following files were written **entirely by the autonomous agent** during verification tests. They are **NOT** part of the core agent logic:

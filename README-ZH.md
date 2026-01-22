@@ -9,6 +9,8 @@
     - **向量語意卡死偵測 (Vector Semantic Stuck Detection)**: 使用 Gemini Embeddings (`text-embedding-004`) 偵測 Agent 是否在語意上重複鬼打牆。
 - **Gemini 強力驅動**: 利用 Gemini Flash 模型的高速與推理能力。
 - **工具沙盒 (Tool Sandbox)**: 受控的檔案系統與終端機操作環境。
+- **異步核心 (Async Core)**: 全面升級為 `asyncio` 架構，提升並發處理能力。
+- **狀態持久化 (State Persistence)**: 使用 SQLite 自動儲存對話記錄與 Session 狀態。
 
 ## 架構說明
 
@@ -17,6 +19,7 @@
 - `src/stuck_detector.py`: 基於向量相似度的無限迴圈偵測引擎。
 - `src/tools.py`: 內部工具的安全實作。
 - `src/circuit_breaker.py`: 錯誤追蹤的狀態機。
+- `src/persistence.py`: 基於 SQLite 的狀態管理與歷史檢索。
 
 ## 自動生成範例 (Generated Examples)
 以下檔案是由 Agent 在驗證測試過程中 **完全自主撰寫** 的範例，皆 **不屬於** 本專案的核心邏輯：

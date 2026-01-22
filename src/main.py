@@ -1,5 +1,6 @@
 import os
 import sys
+import asyncio
 
 # Add project root to python path to allow imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -7,7 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.agent_loop import AgentLoop
 from dotenv import load_dotenv
 
-def main():
+async def main_async():
     load_dotenv() # Load .env if present
     
     # Simple CLI args
@@ -21,7 +22,15 @@ def main():
 
     agent = AgentLoop(task_file=task_file)
     try:
-        agent.run()
+        await agent.run()
+    except asyncio.CancelledError:
+        print("\n🛑 Agent stopped (Cancelled).")
+    except Exception as e:
+         print(f"\n❌ Agent Logic Error: {e}")
+
+def main():
+    try:
+        asyncio.run(main_async())
     except KeyboardInterrupt:
         print("\n🛑 Agent stopped by user.")
 

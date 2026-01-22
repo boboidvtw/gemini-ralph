@@ -2,6 +2,7 @@ import os
 import google.generativeai as genai
 from google.generativeai.types import FunctionDeclaration, Tool
 from typing import List, Dict, Any, Optional
+import asyncio
 
 class GeminiClient:
     def __init__(self, model_name: str = "gemini-flash-latest", api_key: str = None):
@@ -76,11 +77,12 @@ class GeminiClient:
             model_name=model_name,
             tools=self.tools_def
         )
-        self.chat = self.model.start_chat(enable_automatic_function_calling=False) # We handle execution manually for safety
+        # Note: history=[] means we start fresh, but we can load history if needed manually
+        self.chat = self.model.start_chat(enable_automatic_function_calling=False)
 
-    def send_message(self, message: str) -> Any:
+    async def send_message_async(self, message: str) -> Any:
         try:
-            response = self.chat.send_message(message)
+            response = await self.chat.send_message_async(message)
             return response
         except Exception as e:
             print(f"Gemini API Error: {e}")
@@ -100,10 +102,10 @@ class GeminiClient:
                 })
         return calls
     
-    def send_tool_result(self, tool_name: str, result: str):
-        """Send tool execution result back to Gemini"""
+    async def send_tool_result_async(self, tool_name: str, result: str):
+        """Send tool execution result back to Gemini asynchronously"""
         # In the new SDK, we send a Part with function_response
-        self.chat.send_message(
+        await self.chat.send_message_async(
             genai.protos.Content(
                 parts=[genai.protos.Part(
                     function_response=genai.protos.FunctionResponse(
