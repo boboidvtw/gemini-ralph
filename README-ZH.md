@@ -1,4 +1,5 @@
 # Gemini-Ralph
+> **版本: 2.1.0**
 
 > **一個輕量級、全自動的「AI 開發助理工程師」 (Autonomous Coding Agent)**  
 > 只要寫下你的目標 (在 `@fix_plan.md` 中)，它就會自動：**自己讀 Code ➡️ 自己改 Code ➡️ 自己下指令跑測試 ➡️ 發現報錯自己修 ➡️ 循環到任務完成為止。** 它的運作理念類似於輕量本機版的 Devin 或 Claude Code。
@@ -7,6 +8,7 @@
 
 ## 功能特色
 - **自主循環 (Autonomous Loop)**: 依據 `@fix_plan.md` 持續執行任務直到完成。
+- **雙重驗收機制 (Double Validation)**: Agent 在回報任務完成前，強制執行「做法一 (核心邏輯自動化腳本)」與「做法二 (E2E 終端機/Web 模擬測試)」的兩階段防護機制。
 - **進階安全性**: 
     - **熔斷機制 (Circuit Breaker)**: 追蹤連續錯誤，防止 API 濫用。
     - **向量語意卡死偵測 (Vector Semantic Stuck Detection)**: 使用 Gemini Embeddings (`text-embedding-004`) 偵測 Agent 是否在語意上重複鬼打牆。

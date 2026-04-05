@@ -21,7 +21,14 @@ class AgentLoop:
                 system_instruction += f"\nCurrent Plan ({self.task_file}):\n{f.read()}\n"
         else:
              system_instruction += f"\nNo {self.task_file} found. Please create one or ask me to create it.\n"
-        system_instruction += "\nGoal: Complete the remaining tasks in the plan. Use tools to explore, editing, and verify.\nWhen satisfied, call the 'task_completed' tool."
+        system_instruction += """
+Goal: Complete the remaining tasks in the plan. Use your tools to explore, edit, and verify.
+CRITICAL RULE (Double Validation Protocol): Before calling 'task_completed', you MUST systematically verify your work in two phases (if applicable to the task):
+1. Phase 1 (Core/Logic): Write & run automated scripts (e.g. pytest) via run_command to verify internal logic. If errors exist, fix the code and retest until green.
+2. Phase 2 (E2E/UI): Once Phase 1 passes, use UI testing tools (e.g. Playwright) or compiled simulations to verify the final end-user result.
+If Phase 2 fails, you must go back, fix the core codebase, and restart verification strictly from Phase 1.
+Only call 'task_completed' when all tests consecutively pass perfectly without errors.
+"""
 
         self.client = GeminiClient(system_instruction=system_instruction)
         self.tools = ToolSet()

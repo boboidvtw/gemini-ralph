@@ -1,4 +1,5 @@
 # Gemini-Ralph
+> **Version: 2.1.0**
 
 > **A lightweight, fully autonomous "AI Software Engineer" (Autonomous Coding Agent)**  
 > Simply write down your goal (in `@fix_plan.md`), and it will automatically: **Read code ➡️ Modify code ➡️ Run terminal commands to test ➡️ Fix its own bugs ➡️ Loop until the task is complete.** Think of it as a lightweight, local version of tools like Devin or Claude Code.
@@ -7,6 +8,7 @@ A Python-native autonomous coding agent powered by Google Gemini (Flash 2.5/2.0/
 
 ## Features
 - **Autonomous Loop**: Continuously iterates on tasks until completion using `@fix_plan.md`.
+- **Double Validation Protocol**: Agent strictly enforces automated core logic tests AND visual/E2E UI tests before considering a task completed.
 - **Advanced Safety**: 
     - **Circuit Breaker**: Prevents API abuse by tracking consecutive errors.
     - **Vector Semantic Stuck Detection**: Uses Gemini Embeddings (`text-embedding-004`) to detect if the agent is semantically repeating itself.
