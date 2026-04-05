@@ -5,6 +5,7 @@ import asyncio
 import uuid
 from typing import Optional
 from .gemini_client import GeminiClient
+from .local_llm_client import LocalLLMClient
 from .tools import ToolSet
 from .circuit_breaker import CircuitBreaker, CircuitState
 from .stuck_detector import StuckDetector
@@ -30,7 +31,14 @@ If Phase 2 fails, you must go back, fix the core codebase, and restart verificat
 Only call 'task_completed' when all tests consecutively pass perfectly without errors.
 """
 
-        self.client = GeminiClient(system_instruction=system_instruction)
+        provider = os.getenv("PROVIDER", "GEMINI").upper()
+        if provider == "LOCAL":
+            print("🔌 Selected Engine: Local LLM Server (Ollama / LM Studio)")
+            self.client = LocalLLMClient(system_instruction=system_instruction)
+        else:
+            print("🔌 Selected Engine: Google Gemini API")
+            self.client = GeminiClient(system_instruction=system_instruction)
+            
         self.tools = ToolSet()
         self.breaker = CircuitBreaker()
         self.stuck_detector = StuckDetector()
@@ -145,13 +153,13 @@ Only call 'task_completed' when all tests consecutively pass perfectly without e
                     # Save Tool Result to DB
                     self.state_manager.save_message(self.session_id, "tool", f"Tool {name} result: {tool_result}")
 
-                    tool_results_to_send.append({"name": name, "result": str(tool_result)})
+                    tool_results_to_send.append({"id": tool.get("id"), "name": name, "result": str(tool_result)})
                     
                 except Exception as e:
                     error_msg = f"Tool Execution Error: {str(e)}"
                     print(f"   -> {error_msg}")
                     self.breaker.record_error(error_msg)
-                    tool_results_to_send.append({"name": name, "result": error_msg})
+                    tool_results_to_send.append({"id": tool.get("id"), "name": name, "result": error_msg})
 
             # Send ALL results back at once to comply with Gemini API's conversational rhythm
             if tool_results_to_send:

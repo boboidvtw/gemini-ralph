@@ -9,6 +9,7 @@ A Python-native autonomous coding agent powered by Google Gemini (Flash 2.5/2.0/
 ## Features
 - **Autonomous Loop**: Continuously iterates on tasks until completion using `@fix_plan.md`.
 - **Double Validation Protocol**: Agent strictly enforces automated core logic tests AND visual/E2E UI tests before considering a task completed.
+- **Local Model Support**: Natively switch between Gemini API and OpenAI-compatible local endpoints (like Ollama or LM Studio).
 - **Advanced Safety**: 
     - **Circuit Breaker**: Prevents API abuse by tracking consecutive errors.
     - **Vector Semantic Stuck Detection**: Uses Gemini Embeddings (`text-embedding-004`) to detect if the agent is semantically repeating itself.
@@ -44,6 +45,15 @@ The following files were written **entirely by the autonomous agent** during ver
    python src/main.py
    ```
    *Ensure a `@fix_plan.md` exists in the working directory.*
+
+### Running with Local Models (Ollama / LM Studio)
+You can seamlessly switch Gemini-Ralph to use local LLMs (e.g., Qwen2.5-Coder, Llama-3.3) by modifying your environment variables:
+```bash
+PROVIDER=LOCAL
+LOCAL_BASE_URL=http://localhost:11434/v1 # For Ollama (use 1234 for LM Studio)
+OPENCODE_MODEL_ID=qwen2.5-coder:32b # The model name in your local instance
+```
+*(Note: Function calling requires strong reasoning. Models below 14B parameters may fail to format tool JSONs correctly.)*
 
 ## Rate Limits & Configuration
 

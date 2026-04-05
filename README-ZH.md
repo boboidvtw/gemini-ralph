@@ -9,6 +9,7 @@
 ## 功能特色
 - **自主循環 (Autonomous Loop)**: 依據 `@fix_plan.md` 持續執行任務直到完成。
 - **雙重驗收機制 (Double Validation)**: Agent 在回報任務完成前，強制執行「做法一 (核心邏輯自動化腳本)」與「做法二 (E2E 終端機/Web 模擬測試)」的兩階段防護機制。
+- **支援本機大模型 (Ollama / LM Studio)**: 可自由切換使用 Gemini API 或是純本機的 OpenAI 相容伺服器。
 - **進階安全性**: 
     - **熔斷機制 (Circuit Breaker)**: 追蹤連續錯誤，防止 API 濫用。
     - **向量語意卡死偵測 (Vector Semantic Stuck Detection)**: 使用 Gemini Embeddings (`text-embedding-004`) 偵測 Agent 是否在語意上重複鬼打牆。
@@ -44,6 +45,15 @@
    python src/main.py
    ```
    *請確保工作目錄下有 `@fix_plan.md` 檔案。*
+
+### 切換為使用本機模型 (Ollama / LM Studio)
+若要讓 Gemini-Ralph 切換為使用本機伺服器的 LLM (例如 Qwen2.5-Coder 或是 Llama-3.3)，請在環境變數或 `.env` 進行以下設定：
+```bash
+PROVIDER=LOCAL
+LOCAL_BASE_URL=http://localhost:11434/v1 # 若使用 LM Studio 請改為 http://localhost:1234/v1
+OPENCODE_MODEL_ID=qwen2.5-coder:32b # 您本機模型對應的名稱
+```
+*(請注意：自動化 Agent 依賴極強的 Function Calling 能力，若本機模型參數低於 14B，可能會經常發生工具呼叫格式錯誤問題而卡死。)*
 
 ## 速率限制 (Rate Limits) 與設定
 
