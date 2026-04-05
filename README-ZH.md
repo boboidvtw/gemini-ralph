@@ -1,5 +1,8 @@
 # Gemini-Ralph
 
+> **一個輕量級、全自動的「AI 開發助理工程師」 (Autonomous Coding Agent)**  
+> 只要寫下你的目標 (在 `@fix_plan.md` 中)，它就會自動：**自己讀 Code ➡️ 自己改 Code ➡️ 自己下指令跑測試 ➡️ 發現報錯自己修 ➡️ 循環到任務完成為止。** 它的運作理念類似於輕量本機版的 Devin 或 Claude Code。
+
 一個由 Google Gemini (Flash 2.5/2.0/1.5) 驅動的 Python 原生自主編碼 AI Agent。
 
 ## 功能特色
@@ -51,5 +54,5 @@
 修改 `src/agent_loop.py`:
 ```python
 # src/agent_loop.py
-time.sleep(30) # 付費方案可將 30 改為 1 或 0
+await asyncio.sleep(30) # 付費方案可將 30 改為 1 或 0
 ```

@@ -1,5 +1,8 @@
 # Gemini-Ralph
 
+> **A lightweight, fully autonomous "AI Software Engineer" (Autonomous Coding Agent)**  
+> Simply write down your goal (in `@fix_plan.md`), and it will automatically: **Read code ➡️ Modify code ➡️ Run terminal commands to test ➡️ Fix its own bugs ➡️ Loop until the task is complete.** Think of it as a lightweight, local version of tools like Devin or Claude Code.
+
 A Python-native autonomous coding agent powered by Google Gemini (Flash 2.5/2.0/1.5).
 
 ## Features
@@ -51,5 +54,5 @@ If you have a **Paid (Pay-as-you-go)** Gemini API Key, you can reduce this delay
 To change the delay, edit `src/agent_loop.py`:
 ```python
 # src/agent_loop.py
-time.sleep(30) # Change 30 to 1 or 0 for paid plans
+await asyncio.sleep(30) # Change 30 to 1 or 0 for paid plans
 ```

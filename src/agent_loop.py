@@ -13,7 +13,17 @@ from .persistence import StateManager
 class AgentLoop:
     def __init__(self, task_file: str = "@fix_plan.md"):
         self.task_file = task_file
-        self.client = GeminiClient()
+        
+        # Build strict system instruction with the task plan
+        system_instruction = "You are Ralph, an autonomous coding agent.\n"
+        if os.path.exists(self.task_file):
+            with open(self.task_file, 'r') as f:
+                system_instruction += f"\nCurrent Plan ({self.task_file}):\n{f.read()}\n"
+        else:
+             system_instruction += f"\nNo {self.task_file} found. Please create one or ask me to create it.\n"
+        system_instruction += "\nGoal: Complete the remaining tasks in the plan. Use tools to explore, editing, and verify.\nWhen satisfied, call the 'task_completed' tool."
+
+        self.client = GeminiClient(system_instruction=system_instruction)
         self.tools = ToolSet()
         self.breaker = CircuitBreaker()
         self.stuck_detector = StuckDetector()
@@ -36,14 +46,8 @@ class AgentLoop:
         # Restore History if resuming
         history = self.state_manager.get_history(self.session_id)
         if history:
-            print(f"📜 Loaded {len(history)} past messages from DB.")
-            # Note: In a real scenario, we might want to re-inject these into self.client.chat.history
-            # For this MVP, we assume the Context Prompt is enough to ground the agent, 
-            # or we rely on the fact that 'history' variable is just for us to see, 
-            # but we actually need to repopulate the chat object if we wanted true conversational continuity.
-            # However, since we rebuild context every loop via _build_context(), explicit chat history 
-            # is less critical than the prompt itself. 
-            pass
+            print(f"📜 Loaded {len(history)} past messages from DB. Restoring context...")
+            self.client.load_history(history)
 
         while True:
             self.loop_count += 1
@@ -105,6 +109,7 @@ class AgentLoop:
                      break
                 continue
 
+            tool_results_to_send = []
             for tool in tool_calls:
                 name = tool['name']
                 args = tool['args']
@@ -114,8 +119,7 @@ class AgentLoop:
                     print(f"✅ Project Complete. Summary: {args.get('summary')}")
                     return 0
 
-                # Execute Tool Logic (Synchronous tools wrapped in executor if needed, 
-                # but for simplicity we run them directly as file IO is fast enough)
+                # Execute Tool Logic
                 tool_result = ""
                 try:
                     # Sync tool execution
@@ -124,8 +128,6 @@ class AgentLoop:
                     elif name == "read_file":
                         tool_result = self.tools.read_file(args['path'])
                     elif name == "run_command":
-                        # run_command might block, strictly better to await loop.run_in_executor
-                        # tool_result = self.tools.run_command(args['command'])
                         loop = asyncio.get_running_loop()
                         tool_result = await loop.run_in_executor(None, self.tools.run_command, args['command'])
                     elif name == "list_dir":
@@ -133,37 +135,30 @@ class AgentLoop:
                         
                     print(f"   -> Result: {tool_result[:100]}...") 
                     
-                    # Save Tool Result to DB (represented as User role providing info)
+                    # Save Tool Result to DB
                     self.state_manager.save_message(self.session_id, "tool", f"Tool {name} result: {tool_result}")
 
-                    # Send result back
-                    try:
-                        await self.client.send_tool_result_async(name, tool_result)
-                    except Exception as e:
-                        print(f"⚠️ API Error (Tool Result): {e}")
-                        self.breaker.record_error(str(e))
-                        await asyncio.sleep(30)
+                    tool_results_to_send.append({"name": name, "result": str(tool_result)})
                     
                 except Exception as e:
                     error_msg = f"Tool Execution Error: {str(e)}"
                     print(f"   -> {error_msg}")
                     self.breaker.record_error(error_msg)
-                    try:
-                        await self.client.send_tool_result_async(name, error_msg)
-                    except:
-                        pass
+                    tool_results_to_send.append({"name": name, "result": error_msg})
+
+            # Send ALL results back at once to comply with Gemini API's conversational rhythm
+            if tool_results_to_send:
+                try:
+                    await self.client.send_tool_results_async(tool_results_to_send)
+                except Exception as e:
+                    print(f"⚠️ API Error (Tool Result): {e}")
+                    self.breaker.record_error(str(e))
+                    await asyncio.sleep(30)
 
     def _build_context(self) -> str:
-        context = f"You are Ralph, an autonomous coding agent. Loop #{self.loop_count}.\n"
-        
-        # Inject Task Plan
-        if os.path.exists(self.task_file):
-            with open(self.task_file, 'r') as f:
-                context += f"\nCurrent Plan ({self.task_file}):\n{f.read()}\n"
+        # Instead of bloating the history with the full plan every turn,
+        # we configure the plan as a system_instruction and just send a short ping to continue.
+        if self.loop_count == 1:
+            return f"Agent initialized. Loop #{self.loop_count}. Please review the plan in your system instructions and begin."
         else:
-             context += f"\nNo {self.task_file} found. Please create one or ask me to create it.\n"
-
-        context += "\nGoal: Complete the remaining tasks in the plan. Used tools to explore, editing, and verify.\n"
-        context += "When satisfied, call the 'task_completed' tool."
-        
-        return context
+            return f"Continuing execution. Loop #{self.loop_count}. Please analyze your previous results and take the next step."
