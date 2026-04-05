@@ -46,14 +46,24 @@
    ```
    *請確保工作目錄下有 `@fix_plan.md` 檔案。*
 
-### 切換為使用本機模型 (Ollama / LM Studio)
-若要讓 Gemini-Ralph 切換為使用本機伺服器的 LLM (例如 Qwen2.5-Coder 或是 Llama-3.3)，請在環境變數或 `.env` 進行以下設定：
+## 如何透過「本機模型」運行 Agent？ (Ollama / LM Studio)
+
+若您想使用純本機的開源模型（例如 `qwen2.5-coder:32b` 或是 LM Studio 上的模型），您只要在終端機或專案根目錄的 `.env` 中設定以下環境變數即可，**完全不需要修改任何程式碼**：
+
 ```bash
+# 1. 將提供者改成 LOCAL
 PROVIDER=LOCAL
-LOCAL_BASE_URL=http://localhost:11434/v1 # 若使用 LM Studio 請改為 http://localhost:1234/v1
-OPENCODE_MODEL_ID=qwen2.5-coder:32b # 您本機模型對應的名稱
+
+# 2. 設定您的本機 API 伺服器網址
+LOCAL_BASE_URL=http://localhost:11434/v1 # Ollama 預設埠
+# 若使用 LM Studio，請填入 http://localhost:1234/v1
+
+# 3. 指定您現在要跑哪一顆模型
+OPENCODE_MODEL_ID=qwen2.5-coder:32b
 ```
-*(請注意：自動化 Agent 依賴極強的 Function Calling 能力，若本機模型參數低於 14B，可能會經常發生工具呼叫格式錯誤問題而卡死。)*
+
+> **💡 Agent 的溫馨提醒**：
+> 要能讓 Agent 完美自導自演地去呼叫終端機、寫檔並自主循環，對本機模型的「格式推理邏輯」要求**非常高**。強烈建議本機端的模型最少需跑 **14B ~ 32B** 以上的程式專精模型 (如 Qwen 2.5 Coder 32B 或 Llama 3.3)，否則小模型容易因忘記補齊 JSON 參數結構而導致 API 報錯卡死。
 
 ## 速率限制 (Rate Limits) 與設定
 

@@ -46,14 +46,24 @@ The following files were written **entirely by the autonomous agent** during ver
    ```
    *Ensure a `@fix_plan.md` exists in the working directory.*
 
-### Running with Local Models (Ollama / LM Studio)
-You can seamlessly switch Gemini-Ralph to use local LLMs (e.g., Qwen2.5-Coder, Llama-3.3) by modifying your environment variables:
+## How to run the Agent via Local Models? (Ollama / LM Studio)
+
+If you want to use open-source local models (like `qwen2.5-coder:32b` or models hosted on LM Studio), you simply need to set the following environment variables in your terminal or a `.env` file. **No code changes are required**:
+
 ```bash
+# 1. Switch the provider to LOCAL
 PROVIDER=LOCAL
-LOCAL_BASE_URL=http://localhost:11434/v1 # For Ollama (use 1234 for LM Studio)
-OPENCODE_MODEL_ID=qwen2.5-coder:32b # The model name in your local instance
+
+# 2. Set your local API Server URL
+LOCAL_BASE_URL=http://localhost:11434/v1 # Default for Ollama
+# If using LM Studio, use http://localhost:1234/v1
+
+# 3. Specify the exact model ID you wish to run
+OPENCODE_MODEL_ID=qwen2.5-coder:32b
 ```
-*(Note: Function calling requires strong reasoning. Models below 14B parameters may fail to format tool JSONs correctly.)*
+
+> **💡 Agent Warning**:
+> For the agent to successfully navigate the terminal, write files, and loop autonomously, the chosen local model must have **excellent "Function Calling / Format Reasoning"** capabilities. We strongly recommend using coding-specialized models with at least **14B to 32B** parameters (e.g., Qwen 2.5 Coder 32B or Llama 3.3). Smaller models will likely fail to construct valid JSON tool parameters, causing the loop to break.
 
 ## Rate Limits & Configuration
 
